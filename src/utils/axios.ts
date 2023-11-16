@@ -55,6 +55,7 @@ export const fetcher = async (args: string | [string, AxiosRequestConfig]) => {
 
 export const endpoints = {
   auctions: {
-    list: '/auction/get',
+    list: '/auction/get-bid-state',
+    request: '/auction/get-auction-request',
   }
 };

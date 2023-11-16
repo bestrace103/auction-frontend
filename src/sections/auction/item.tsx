@@ -1,20 +1,10 @@
+import { useState } from 'react';
 // @mui
-import Box from '@mui/material/Box';
-import Link from '@mui/material/Link';
-import Card from '@mui/material/Card';
-import Stack from '@mui/material/Stack';
-import Avatar from '@mui/material/Avatar';
-import MenuItem from '@mui/material/MenuItem';
-import IconButton from '@mui/material/IconButton';
+import { Box, Link, Card, Stack, IconButton, Avatar } from '@mui/material';
+import CheckIcon from '@mui/icons-material/Check';
 // routes
-import { paths } from 'src/routes/paths';
-import { useRouter } from 'src/routes/hooks';
 import { RouterLink } from 'src/routes/components';
-// hooks
-import { useResponsive } from 'src/hooks/use-responsive';
 // utils
-import { fDate } from 'src/utils/format-time';
-import { fShortenNumber } from 'src/utils/format-number';
 import { API_PATH, ASSETS_URL } from 'src/config-global';
 // types
 // components
@@ -22,7 +12,6 @@ import Label from 'src/components/label';
 import Image from 'src/components/image';
 import Iconify from 'src/components/iconify';
 import TextMaxLine from 'src/components/text-max-line';
-import CustomPopover, { usePopover } from 'src/components/custom-popover';
 
 // ----------------------------------------------------------------------
 
@@ -35,26 +24,32 @@ type Props = {
     file_name: string;
     time_limit: string;
     status: string;
+    bidState: boolean;
   };
-  setBid: (val: any) => void;
+  setBid: (value: any) => void;
 };
 
 export default function Item({ data, setBid }: Props) {
-  const popover = usePopover();
+  const { _id, auction_name, auction_price, description, file_name, time_limit, status, bidState } =
+    data;
 
-  const router = useRouter();
-  const { _id, auction_name, auction_price, description, file_name, time_limit, status } = data;
+  const [limitTime, setLimitTime] = useState('');
 
-  const mdUp = useResponsive('up', 'md');
+  setTimeout(() => {
+    const total = Number(time_limit) - Number(new Date().valueOf());
+    if (total < 0) {
+      setLimitTime('Completed');
+    } else {
+      const days = Math.floor(total / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((total / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((total / 1000 / 60) % 60);
+      const seconds = Math.floor((total / 1000) % 60);
 
-  const title = 'sada';
-  const author = 'sada';
-  const publish = 'published';
-  const coverUrl = 'sada';
-  const createdAt = 'sada';
-  const totalViews = 'sada';
-  const totalShares = 'sada';
-  const totalComments = 'sada';
+      const displayDays = days ? `${days}days ` : '';
+      const displaydate = `Remain ${displayDays} ${hours} hrs ${minutes} mins ${seconds} secs`;
+      setLimitTime(displaydate);
+    }
+  }, 1000);
 
   return (
     <>
@@ -66,7 +61,7 @@ export default function Item({ data, setBid }: Props) {
           }}
         >
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
-            <Label variant="soft" color={(publish === 'published' && 'info') || 'default'}>
+            <Label variant="soft" color={(status === 'pending' && 'info') || 'default'}>
               {status}
             </Label>
             <Label color="default">{auction_price}</Label>
@@ -88,14 +83,16 @@ export default function Item({ data, setBid }: Props) {
           </Stack>
 
           <Stack direction="row" alignItems="center">
-            <IconButton
-              color="default"
-              onClick={() => {
-                setBid(data);
-              }}
-            >
-              <Iconify icon="solar:pen-bold" />
-            </IconButton>
+            {Number(time_limit) - Number(new Date().valueOf()) && (
+              <IconButton
+                color="default"
+                onClick={() => {
+                  setBid(data);
+                }}
+              >
+                <Iconify icon="solar:pen-bold" />
+              </IconButton>
+            )}
 
             <Stack
               spacing={1.5}
@@ -107,36 +104,27 @@ export default function Item({ data, setBid }: Props) {
                 color: 'text.disabled',
               }}
             >
-              <Stack direction="row" alignItems="center">
-                <Iconify icon="eva:message-circle-fill" width={16} sx={{ mr: 0.5 }} />
-                {fShortenNumber(totalComments)}
-              </Stack>
-
-              <Stack direction="row" alignItems="center">
-                <Iconify icon="solar:share-bold" width={16} sx={{ mr: 0.5 }} />
-                {fShortenNumber(totalShares)}
-              </Stack>
+              {limitTime}
             </Stack>
           </Stack>
         </Stack>
 
-        {mdUp && (
-          <Box
-            sx={{
-              width: 180,
-              height: 240,
-              position: 'relative',
-              flexShrink: 0,
-              p: 1,
-            }}
-          >
-            <Image
-              alt={title}
-              src={`${ASSETS_URL}${file_name}`}
-              sx={{ height: 1, borderRadius: 1.5 }}
-            />
-          </Box>
-        )}
+        <Box
+          sx={{
+            width: 180,
+            height: 240,
+            position: 'relative',
+            flexShrink: 0,
+            p: 1,
+          }}
+        >
+          {bidState && <CheckIcon sx={{ position: 'absolute', right: '10px', zIndex: 10 }} />}
+          <Image
+            alt={auction_name}
+            src={`${ASSETS_URL}${file_name}`}
+            sx={{ height: 1, borderRadius: 1.5 }}
+          />
+        </Box>
       </Stack>
     </>
   );

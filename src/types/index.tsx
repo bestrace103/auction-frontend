@@ -48,7 +48,12 @@ export type AuctionItem = {
 
 export type BidAuctionType = {
   auctionId: string;
-  bidPrice: string;
+  bidPrice: number;
+};
+
+export type ButtonType = {
+  value: number;
+  color: 'inherit' | 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning';
 };
 
 export type ApiContextType = {

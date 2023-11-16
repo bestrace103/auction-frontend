@@ -28,23 +28,24 @@ export function useGetAuctions() {
 
 // ----------------------------------------------------------------------
 
-// export function useGetProduct(productId: string) {
-//   const URL = productId ? [endpoints.product.details, { params: { productId } }] : null;
+export function useGetAuctionRequest() {
+  const URL = endpoints.auctions.request;
 
-//   const { data, isLoading, error, isValidating } = useSWR(URL, fetcher);
+  const { data, isLoading, error, isValidating } = useSWR(URL, fetcher);
 
-//   const memoizedValue = useMemo(
-//     () => ({
-//       product: data?.product as IProductItem,
-//       productLoading: isLoading,
-//       productError: error,
-//       productValidating: isValidating,
-//     }),
-//     [data?.product, error, isLoading, isValidating]
-//   );
+  const memoizedValue = useMemo(
+    () => ({
+      auctionRequest: (data as any[]) || [],
+      auctionRequestLoading: isLoading,
+      auctionRequestError: error,
+      auctionRequestValidating: isValidating,
+      auctionRequestEmpty: !isLoading && !data?.length,
+    }),
+    [data, error, isLoading, isValidating]
+  );
 
-//   return memoizedValue;
-// }
+  return memoizedValue;
+}
 
 // // ----------------------------------------------------------------------
 
